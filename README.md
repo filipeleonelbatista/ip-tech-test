@@ -1,30 +1,66 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<img width="100%" src=".github/1.png">
+<img width="100%" src=".github/2.png">
+<img width="100%" src=".github/3.png">
+<img width="100%" src=".github/4.png">
 
-Currently, two official plugins are available:
+# Cadastro de pacientes e atendimentos Clinica ACME
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## Indice
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- [Sobre](#-sobre)
 
-- Configure the top-level `parserOptions` property like this:
+### 🔖&nbsp; Sobre
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+Desafio tecnico para criar um CRUD de pacientes de uma clinica ficticia e
+um CRUD de atendimento destes pacientes. Mais detalhes do desafio podem ser encontrados no link a baixo
+
+[Desafio](./challenge.md)
+
+---
+## Tecnologias
+
+Esse projeto foi desenvolvido com as seguintes principais tecnologias:
+
+- [React JS](https://legacy.reactjs.org/docs/getting-started.html)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Shadcn/UI](https://ui.shadcn.com/)
+
+e mais...
+
+---
+## Instalação
+
+O projeto roda com [Node.js](https://nodejs.org/) v20+.
+
+Instruções para instalar as dependencias e inicie o projeto.
+
+```sh
+
+cd ip-tech-test
+npm i
+npm run dev
+
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+---
+
+<h3 align="center" >Vamos nos conectar 😉</h3>
+<p align="center">
+  <a href="https://www.linkedin.com/in/filipeleonelbatista/">
+    <img alt="LinkedIn" width="22px" src="https://github.com/filipeleonelbatista/filipeleonelbatista/blob/master/assets/052-linkedin.svg" />
+  </a>&ensp;
+  <a href="mailto:filipe.x2016@gmail.com">
+    <img alt="Email" width="22px" src="https://github.com/filipeleonelbatista/filipeleonelbatista/blob/master/assets/gmail.svg" />
+  </a>&ensp;
+  <a href="https://instagram.com/filipeleonelbatista">
+    <img alt="Instagram" width="22px" src="https://github.com/filipeleonelbatista/filipeleonelbatista/blob/master/assets/044-instagram.svg" />
+  </a>
+</p>
+<br />
+<p align="center">
+    Desenvolvido 💜 por Filipe Batista 
+</p>
