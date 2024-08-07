@@ -1,4 +1,5 @@
 import { Atendimento, AtendimentoComUsuario } from "@/@types/types";
+import AtendimentoForm from "@/components/atendimento-form";
 import Layout from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useAtendimentoContext } from "@/hooks/useAtendimentoContext";
-import { FilePenIcon, PlusIcon } from "lucide-react";
+import { ArrowDown01, ArrowDownAz, ArrowUp01, ArrowUpDown, ArrowUpZa, CalendarArrowDown, CalendarArrowUp, FilePenIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
 export default function Attendances() {
   const { attendances, toggleAttendanceStatus } = useAtendimentoContext();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: "dataHora", direction: "desc" });
 
   const filteredAttendances = attendances.filter(
     (atendimento: AtendimentoComUsuario) => {
@@ -35,12 +37,38 @@ export default function Attendances() {
     }
   );
 
+  const sortedAttendances = [...filteredAttendances].sort((a, b) => {
+    const key = sortConfig.key;
+    if (!key) return 0;
+
+    let aValue: string | Date;
+    let bValue: string | Date;
+
+    if (key === "dataHora") {
+      aValue = new Date(a[key]);
+      bValue = new Date(b[key]);
+    } else if (key === "patient.name") {
+      aValue = a.patient?.name.toLowerCase() || "";
+      bValue = b.patient?.name.toLowerCase() || "";
+    } else {
+      aValue = a[key]?.toLowerCase() || "";
+      bValue = b[key]?.toLowerCase() || "";
+    }
+
+    if (aValue < bValue) {
+      return sortConfig.direction === "asc" ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return sortConfig.direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAttendances.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedAttendances.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(filteredAttendances.length / itemsPerPage);
 
@@ -52,6 +80,15 @@ export default function Attendances() {
     await toggleAttendanceStatus(atendimento.id);
   };
 
+  const handleSort = (key: string) => {
+    setSortConfig((prevConfig) => {
+      const direction =
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc";
+      return { key, direction };
+    });
+  };
 
   return (
     <Layout>
@@ -105,6 +142,7 @@ export default function Attendances() {
                       Adicione as informações do atendimento
                     </DialogDescription>
                   </div>
+                  <AtendimentoForm />
                 </DialogHeader>
               </DialogContent>
             </Dialog>
@@ -132,16 +170,56 @@ export default function Attendances() {
               <thead>
                 <tr className="bg-muted">
                   <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
-                    Paciente
+                    <button
+                      onClick={() => handleSort("patient.name")}
+                      className="flex items-center w-full"
+                    >
+                      Paciente
+                      {sortConfig.key === "patient.name" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowDownAz className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowUpZa className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )
+                      }
+                    </button>
                   </th>
                   <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
-                    Data e Hora
+                    <button
+                      onClick={() => handleSort("dataHora")}
+                      className="flex items-center w-full"
+                    >
+                      Data e Hora
+                      {sortConfig.key === "dataHora" ?
+                        (sortConfig.direction === "asc" ? (
+                          <CalendarArrowDown className="w-4 h-4 ml-1" />
+                        ) : (
+                          <CalendarArrowUp className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )}
+                    </button>
                   </th>
                   <th className="py-3 px-4 text-left" scope="col">
                     Descrição
                   </th>
                   <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
-                    Status
+                    <button
+                      onClick={() => handleSort("status")}
+                      className="flex items-center w-full"
+                    >
+                      Status
+                      {sortConfig.key === "status" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowUp01 className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowDown01 className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )}
+                    </button>
                   </th>
                   <th className="py-3 px-4 text-left" scope="col">
                     Ações
@@ -214,6 +292,10 @@ export default function Attendances() {
                                   Atualize as informações do atendimento
                                 </DialogDescription>
                               </div>
+                              <AtendimentoForm
+                                isEditable
+                                editableAtendimento={atendimento}
+                              />
                             </DialogHeader>
                           </DialogContent>
                         </Dialog>
