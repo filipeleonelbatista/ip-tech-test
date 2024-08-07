@@ -1,6 +1,8 @@
 import { Patient } from '@/@types/types';
+import { Atendimento, AtendimentoComUsuario } from '@/@types/types';
 
 const STORAGE_KEY_PATIENTS = 'patients';
+const STORAGE_KEY_ATTENDANCES = 'attendances';
 
 const getPatientsFromStorage = (): Patient[] => {
   const patients = localStorage.getItem(STORAGE_KEY_PATIENTS);
@@ -71,6 +73,91 @@ export const checkCpfExists = async (cpf: string): Promise<boolean> => {
   });
 };
 
+const getAttendancesFromStorage = (): Atendimento[] => {
+  const attendances = localStorage.getItem(STORAGE_KEY_ATTENDANCES);
+  return attendances ? (JSON.parse(attendances) as Atendimento[]) : [];
+};
+
+const saveAttendancesToStorage = (attendances: Atendimento[]) => {
+  localStorage.setItem(STORAGE_KEY_ATTENDANCES, JSON.stringify(attendances));
+};
+
+export const getAttendances = async (): Promise<Atendimento[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(getAttendancesFromStorage());
+    }, 500);
+  });
+};
+
+export const createAttendance = async (attendance: Omit<Atendimento, 'id'>): Promise<AtendimentoComUsuario> => {
+  return new Promise(async (resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        const attendances = getAttendancesFromStorage();
+        const newAttendance: Atendimento = { ...attendance, id: Date.now() };
+        const updatedAttendances = [...attendances, newAttendance];
+        saveAttendancesToStorage(updatedAttendances);
+
+        const patient = await getPatientById(newAttendance.id_Paciente);
+
+        const attendanceWithPatient: AtendimentoComUsuario = {
+          ...newAttendance,
+          patient,
+        };
+
+        resolve(attendanceWithPatient);
+      } catch (error) {
+        console.error('Erro ao criar o atendimento:', error);
+        reject(error);
+      }
+    }, 500);
+  });
+};
+
+export const updateAttendance = async (updatedAttendance: Atendimento): Promise<AtendimentoComUsuario> => {
+  return new Promise(async (resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        const attendances = getAttendancesFromStorage();
+        const updatedAttendances = attendances.map((attendance) =>
+          attendance.id === updatedAttendance.id ? updatedAttendance : attendance
+        );
+        saveAttendancesToStorage(updatedAttendances);
+
+        const patient = await getPatientById(updatedAttendance.id_Paciente);
+
+        const attendanceWithPatient: AtendimentoComUsuario = {
+          ...updatedAttendance,
+          patient,
+        };
+
+        resolve(attendanceWithPatient);
+      } catch (error) {
+        console.error('Erro ao atualizar o atendimento:', error);
+        reject(error);
+      }
+    }, 500);
+  });
+};
+
+export const toggleAttendanceStatus = async (attendanceId: number): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const attendances = getAttendancesFromStorage();
+      const updatedAttendances = attendances.map((attendance) => {
+        if (attendance.id === attendanceId) {
+          const updatedStatus: 'Ativo' | 'Inativo' = attendance.status === 'Ativo' ? 'Inativo' : 'Ativo';
+          return { ...attendance, status: updatedStatus };
+        }
+        return attendance;
+      });
+      saveAttendancesToStorage(updatedAttendances);
+      resolve();
+    }, 500);
+  });
+};
+
 export const getActivePatients = async (): Promise<Patient[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -87,6 +174,25 @@ export const getPatientById = async (id: number): Promise<Patient | null> => {
       const patients = getPatientsFromStorage();
       const patient = patients.find((patient) => patient.id === id) || null;
       resolve(patient);
+    }, 500);
+  });
+};
+
+export const getAttendancesWithPatientInfo = async (): Promise<AtendimentoComUsuario[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const attendances = getAttendancesFromStorage();
+      const patients = getPatientsFromStorage();
+
+      const attendancesWithPatientInfo = attendances.map((attendance) => {
+        const patient = patients.find((p) => p.id === attendance.id_Paciente) || null;
+        return {
+          ...attendance,
+          patient,
+        };
+      });
+
+      resolve(attendancesWithPatientInfo);
     }, 500);
   });
 };
