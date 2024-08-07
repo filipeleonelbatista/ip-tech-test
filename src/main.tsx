@@ -1,18 +1,21 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import './global.css'
-import Routes from './Routes.tsx'
-import { Toaster } from './components/ui/toaster.tsx'
-import { AuthContextProvider } from './contexts/AuthContext.tsx'
-import { PatientProvider } from './contexts/PatientsContext.tsx'
+import Routes from './Routes'
+import { AuthContextProvider } from './contexts/AuthContext'
+import { PatientProvider } from './contexts/PatientsContext'
+import { Toaster } from './components/ui/toaster'
+import { AtendimentoProvider } from './contexts/AtendimentosContext'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
     <AuthContextProvider>
       <PatientProvider>
-        <Routes />
-        <Toaster />
+        <AtendimentoProvider>
+          <Routes />
+          <Toaster />
+        </AtendimentoProvider>
       </PatientProvider>
     </AuthContextProvider>
-  </StrictMode>,
+  </React.StrictMode>,
 )
