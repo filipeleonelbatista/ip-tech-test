@@ -1,13 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useFormik } from "formik";
 import { EyeIcon, EyeOffIcon, MountainIcon } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as Yup from 'yup';
 
 export default function LoginPage() {
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const { signInUser, handleForgotUser } = useAuth();
 
   const handlePasswordToggle = () => {
     setShowPassword((prevState) => !prevState);
@@ -25,7 +31,15 @@ export default function LoginPage() {
     },
     validationSchema,
     onSubmit: async (values) => {
-
+      const { status, message } = await signInUser(values.username, values.password);
+      if (status) {
+        navigate("/patients")
+      } else {
+        toast({
+          variant: 'destructive',
+          title: message || "Ocorreu um erro ao processar a solicitação.",
+        });
+      }
     },
   });
 
