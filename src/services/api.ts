@@ -95,7 +95,7 @@ export const createAttendance = async (attendance: Omit<Atendimento, 'id'>): Pro
     setTimeout(async () => {
       try {
         const attendances = getAttendancesFromStorage();
-        const newAttendance: Atendimento = { ...attendance, id: Date.now() };
+        const newAttendance: Atendimento = { ...attendance, id: Date.now() }; 
         const updatedAttendances = [...attendances, newAttendance];
         saveAttendancesToStorage(updatedAttendances);
 
@@ -103,7 +103,7 @@ export const createAttendance = async (attendance: Omit<Atendimento, 'id'>): Pro
 
         const attendanceWithPatient: AtendimentoComUsuario = {
           ...newAttendance,
-          patient,
+          patient, 
         };
 
         resolve(attendanceWithPatient);
@@ -129,7 +129,7 @@ export const updateAttendance = async (updatedAttendance: Atendimento): Promise<
 
         const attendanceWithPatient: AtendimentoComUsuario = {
           ...updatedAttendance,
-          patient,
+          patient, 
         };
 
         resolve(attendanceWithPatient);
