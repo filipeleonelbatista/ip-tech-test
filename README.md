@@ -10,6 +10,8 @@
 ## Indice
 
 - [Sobre](#-sobre)
+- [Tecnologias](#Tecnologias)
+- [Instalação](#Instalação)
 
 ### 🔖&nbsp; Sobre
 
