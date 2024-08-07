@@ -1,6 +1,3 @@
-import { Patient } from "@/@types/types";
-import Layout from "@/components/layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,16 +8,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useState, useEffect } from "react";
+import { Patient } from "@/@types/types";
+import Layout from "@/components/layout";
+import PatientForm from "@/components/patient-form";
+import { Badge } from "@/components/ui/badge";
+import { ArrowDown01, ArrowDownAz, ArrowUp01, ArrowUpDown, ArrowUpZa, FilePenIcon, PlusIcon } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { usePatientContext } from "@/hooks/usePatientContext";
 import { calculateAge } from "@/lib/calculateAge";
-import { FilePenIcon, PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { usePatientContext } from "@/hooks/usePatientContext";
 
 export default function Component() {
   const { patients, fetchPatients, togglePatientStatus } = usePatientContext();
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [sortConfig, setSortConfig] = useState({ key: "name", direction: "asc" });
 
   useEffect(() => {
     fetchPatients();
@@ -33,11 +36,33 @@ export default function Component() {
     return nameMatch || cpfMatch || statusMatch;
   });
 
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    const { key, direction } = sortConfig;
+    let aValue: string | Date;
+    let bValue: string | Date;
+
+    if (key === "dateOfBirth") {
+      aValue = new Date(a[key]);
+      bValue = new Date(b[key]);
+    } else {
+      aValue = a[key]?.toLowerCase() || "";
+      bValue = b[key]?.toLowerCase() || "";
+    }
+
+    if (aValue < bValue) {
+      return direction === "asc" ? -1 : 1;
+    }
+    if (aValue > bValue) {
+      return direction === "asc" ? 1 : -1;
+    }
+    return 0;
+  });
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPatients.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedPatients.slice(indexOfFirstItem, indexOfLastItem);
 
   const totalPages = Math.ceil(filteredPatients.length / itemsPerPage);
 
@@ -49,6 +74,15 @@ export default function Component() {
     await togglePatientStatus(patient.id);
   };
 
+  const handleSort = (key: string) => {
+    setSortConfig((prevConfig) => {
+      const direction =
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc";
+      return { key, direction };
+    });
+  };
 
   return (
     <Layout>
@@ -96,6 +130,7 @@ export default function Component() {
                       Adicione as informações do paciente
                     </DialogDescription>
                   </div>
+                  <PatientForm />
                 </DialogHeader>
               </DialogContent>
             </Dialog>
@@ -115,14 +150,54 @@ export default function Component() {
             <table className="w-full table-auto">
               <thead>
                 <tr className={`bg-muted`}>
-                  <th className="py-3 px-4 text-left" scope="col">
-                    Nome
+                  <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
+                    <button
+                      onClick={() => handleSort("name")}
+                      className="flex items-center w-full"
+                    >
+                      Nome
+                      {sortConfig.key === "name" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowDownAz className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowUpZa className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )
+                      }
+                    </button>
                   </th>
-                  <th className="py-3 px-4 text-left" scope="col">
-                    Dt. Nasc.
+                  <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
+                    <button
+                      onClick={() => handleSort("dateOfBirth")}
+                      className="flex items-center w-full"
+                    >
+                      Dt. Nasc.
+                      {sortConfig.key === "dateOfBirth" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowDown01 className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowUp01 className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )}
+                    </button>
                   </th>
-                  <th className="py-3 px-4 text-left" scope="col">
-                    CPF
+                  <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
+                    <button
+                      onClick={() => handleSort("cpf")}
+                      className="flex items-center w-full"
+                    >
+                      CPF
+                      {sortConfig.key === "cpf" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowDown01 className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowUp01 className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )}
+                    </button>
                   </th>
                   <th className="py-3 px-4 text-left" scope="col">
                     Sexo
@@ -130,8 +205,21 @@ export default function Component() {
                   <th className="py-3 px-4 text-left" scope="col">
                     Endereço
                   </th>
-                  <th className="py-3 px-4 text-left" scope="col">
-                    Status
+                  <th className="py-3 px-4 text-left hover:bg-gray-200" scope="col">
+                    <button
+                      onClick={() => handleSort("status")}
+                      className="flex items-center w-full"
+                    >
+                      Status
+                      {sortConfig.key === "status" ?
+                        (sortConfig.direction === "asc" ? (
+                          <ArrowDown01 className="w-4 h-4 ml-1" />
+                        ) : (
+                          <ArrowUp01 className="w-4 h-4 ml-1" />
+                        )) : (
+                          <ArrowUpDown className="w-4 h-4 ml-1" />
+                        )}
+                    </button>
                   </th>
                   <th className="py-3 px-4 text-left" scope="col">
                     Ações
@@ -210,6 +298,7 @@ export default function Component() {
                                 Atualize as informações do paciente
                               </DialogDescription>
                             </div>
+                            <PatientForm isEditable editablePatient={patient} />
                           </DialogHeader>
                         </DialogContent>
                       </Dialog>
